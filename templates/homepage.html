@@ -1,0 +1,44 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js'></script>
+</head>
+<body>
+    <div class='container'>
+        <h1 class='text-center text-info'>سایت در حال  توسعست</h1>
+        <br>
+        <div class="row">
+        {% for j in product  %}
+            <div class="card col-4 text-right" >
+                <img class="card-img-top" src="{{j.image.url}}" width='100' height='300' alt="Card image cap">
+                <div class="card-body">
+                <h5 class="card-title">{{j.title}}</h5>
+                <p>: ویزگی ها</p>
+                {% for i in j.attr_product_set.all %}
+                    <p class="card-text">{{i.value}} :   {{i.att_cat.title}}</p>
+                {% endfor %}
+                <p>: رنگ های  موجود  </p>
+                <div class='row'>
+                {% for i in j.price_att.all %}
+                 {% if i.type == "C" %}
+                    <div style='width:25px;height:25px;background-color:{{i.value}};margin-right:10px'></div>
+                 {% endif %}
+                {% endfor %}
+             </div>
+             <br>
+                <a href="#" class="btn btn-primary">ادامه جزئیات</a>
+                </div>
+            </div>
+         {% endfor %} 
+         
+        </div>
+    </div>
+     
+
+    
+</body>
+</html>
