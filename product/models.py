@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Category(models.Model):
     title = models.CharField(max_length=50)
 
@@ -15,9 +14,16 @@ class Product(models.Model):
     image = models.ImageField(blank=True, null=True)
     category = models.ManyToManyField(Category)
     product_type=models.BooleanField(default=False,verbose_name='نوع کالا /پیچیده یا ساده ')
+    brand_name_en=models.CharField(max_length=50,null=True)
+    brand_name_fa=models.CharField(max_length=50,null=True)
 
     def __str__(self):
         return self.title
+
+    def calculate_price(self):
+        price_att=self.price_att.all().first()
+        price=self.price+price_att.price
+        return price
 
 
 class Attribute_Category(models.Model):
@@ -47,6 +53,7 @@ class Features_price_effective(models.Model):
         choices=(('D', 'Dropdown'), ('C', 'checkbox')), max_length=10)
     quantity = models.IntegerField()
     price = models.IntegerField()
+    colorname=models.CharField(null=True,blank=True,max_length=50)
 
     def __str__(self):
         return self.product.title
