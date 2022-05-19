@@ -13,7 +13,7 @@ class Product(models.Model):
     quantity = models.IntegerField(null=True, blank=True,verbose_name='تعداد کل محصول ')
     image = models.ImageField(blank=True, null=True)
     category = models.ManyToManyField(Category)
-    product_type=models.BooleanField(default=False,verbose_name='نوع کالا /پیچیده یا ساده ')
+    product_type=models.BooleanField(default=False,verbose_name='نوع کالا /پیچیده ')
     brand_name_en=models.CharField(max_length=50,null=True)
     brand_name_fa=models.CharField(max_length=50,null=True)
 
@@ -56,4 +56,4 @@ class Features_price_effective(models.Model):
     colorname=models.CharField(null=True,blank=True,max_length=50)
 
     def __str__(self):
-        return self.product.title
+        return self.colorname

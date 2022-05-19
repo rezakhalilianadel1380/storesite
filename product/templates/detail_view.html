@@ -1,4 +1,6 @@
 {% load humanize %}
+{% load static %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,41 +9,137 @@
     <title>Document</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
     <script src='https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js'></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+    <link href="{% static 'style.css' %}" rel="stylesheet">
+    <meta name="robots" content="noindex,follow" />
+    <style>
+        .color-choose input[type="radio"]:checked + label span {
+            background-image: url({% static 'check-icn.svg' %});
+            background-repeat: no-repeat;
+            background-position: center;
+          }
+          @font-face {
+            font-family:iran;
+            src: url({% static 'IRANYekanLight.TTF' %});
+          }
+
+          body{
+                font-family:iran;      
+          }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="row border text-right">
-            <div class='col-4  border'>
+    <div class="container  text-right">
+        <div class="row border">
+
+            <div class='col-md-4  border' id='product_image'>
               <img src="{{object.image.url}}" alt="product_image" width="100%" height='300px'> <br>
               {% if  not object.product_type %}
-              <p class='text-danger text-center'> {{object.price|intcomma:False}} :  قیمت</p>
+              <p class=' text-center' ><span id='price' class='text-danger'>{{object.price | intcomma:False}}</span>  :  قیمت</p>
               {% else %}
-              <p class='text-danger text-center'> {{object.calculate_price}} :  قیمت</p>
+              <p class=' text-center' > <span id='price' class='text-danger'>{{object.calculate_price|intcomma:False}}</span> :  قیمت</p>
               {% endif %}
+              <button class='btn btn-danger btn-block mb-3' onclick='add_to_cart()'>افزودن به سبد خرید</button>
             </div>
-            <div class='col-8'>
-                <h1 class='text-right'>{{object.title}}</h1>
+            <div class='col-md-8' id='product_detail'>
+                <h2 class='text-right'>{{object.title}}</h2>
                 <hr>
                 <p>: مشخصات  </p>
                 {% for i in object.attr_product_set.all %}
                     <p class="card-text bg-light">   <span class='mr-5'> {{i.value}}</span>         :      <span>{{i.att_cat.title}}</span>    </p>
                 {% endfor %}
-                <p class='text-right'>: رنگ  </p>
-                <div class="row p-1 float-right">
-                
-                {% for i in object.price_att.all %}
-                 
-                 {% if i.type == "C" %}
-                    
-                     <input  value='{{i.id}}'  {% if forloop.first %}checked{% endif %} name='color'   type="radio" style="background-color:{{i.value}};">
-                 {% endif %} 
-                {% endfor %}
+                <div class="product_quantity">
+                    <span>:تعداد  </span>
+                    <br>
+                    <input id='quantity' type="Number" min='1' class='mt-2' value='1'>
                  </div>
+                 <br>
+                 {% if object.product_type %}
+                <div class="product-color">
+                    <p>: رنگ </p>
+                    <div class="color-choose">
+                        {% for i in object.price_att.all %}
+                            {% if i.type == "C" %}
+                                <div>
+                                    <input onchange='fnc(this)' type="radio" id="{{i.colorname}}" name="color" value="{{i.id}}" {% if forloop.first %}checked{% endif %} >
+                                    <label for="{{i.colorname}}"><span></span></label>
+                                </div>
+                            {% endif %} 
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
         </div>
-
-
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js" charset="utf-8"></script>
+    <script src="{% static 'script.js' %}" charset="utf-8"></script>
+    <script>
+        function fnc(a){
+            $.ajax({
+                url:'/productcolor',
+                type:'GET',
+                data:{
+                    "color":a.value,
+                },
+                success:function(rsp){
+                    Number=rsp.price
+                    Number+= '';
+                    Number= Number.replace(',', '');
+                    x = Number.split('.');
+                    y = x[0];
+                    z= x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(y))
+                    y= y.replace(rgx, '$1' + ',' + '$2');
+                    document.getElementById('price').innerHTML=y+z;
+                    
+                },
+            });
+        }
+        function add_to_cart(){  
+            colors=document.getElementsByName('color') ;
+            for(i=0;i<colors.length;i++){
+                if(colors[i].checked){
+                    color=colors[i]
+                }
+            }
+            $.ajax({
+                url:'/api/cart/add',
+                type:'POST',
+                headers: {'X-CSRFToken': csrftoken},
+                data:{
+                    "color":color.value,
+                    'quantity':$('#quantity').val(),
+                },
+                success:function(rsp){
+                    alert(rsp.payam);
+                   
+                   
+                },
+            });
+           
+      }
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+      }
+          return cookieValue;
+          }
+          const csrftoken = getCookie('csrftoken');
+  
+    </script>
 </body>
 </html>

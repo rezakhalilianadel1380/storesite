@@ -8,8 +8,9 @@ from .views import homepage
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',homepage),
-    path('',include('product.urls'))
-
+    path('',include('product.urls')),
+    path('',include('order.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 
