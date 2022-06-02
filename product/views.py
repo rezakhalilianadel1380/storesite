@@ -8,7 +8,6 @@ from order.models  import Cart, Cart_Item
 # Create your views here.
 
 
-
 class ProducDetail(DetailView):
     model = Product
     template_name = "detail_view.html"
